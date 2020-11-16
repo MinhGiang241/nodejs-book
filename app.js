@@ -5,12 +5,14 @@
 
 const express = require("express");
 const bodyParser = require("body-parser");
-const adminData = require("./routes/admin");
+const adminRoutes = require("./routes/admin");
 const shopRoutes = require("./routes/shop");
 const path = require("path");
-// const expressHbs = require("express-handlebars");
-
+const notFound = require("./controller/404");
+const db = require("./util/database");
 const app = express();
+
+// const expressHbs = require("express-handlebars");
 
 // app.engine(
 //   "hbs",
@@ -20,17 +22,18 @@ const app = express();
 //     defaultLayout: "main-layout",
 //   })
 // );
-app.set("view engine", "ejs");
+
+db.execute("SELECT * FROM products");
+
+app.set("view engine", "pug");
 app.set("views", "views");
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, "public")));
 
-app.use("/admin", adminData.routes);
+app.use("/admin", adminRoutes);
 app.use(shopRoutes);
 
-app.use((req, res, next) => {
-  res.status(404).render("404", { pageTitle: "Page not found" });
-});
+app.use(notFound.notFound);
 
 app.listen(3000);
