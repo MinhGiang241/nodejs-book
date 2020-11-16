@@ -23,8 +23,6 @@ const app = express();
 //   })
 // );
 
-db.execute("SELECT * FROM products");
-
 app.set("view engine", "pug");
 app.set("views", "views");
 
