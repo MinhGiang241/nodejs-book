@@ -11,8 +11,8 @@ block content
       .form-control
         label(for="title") Title
         input(type="text" name="title" value=(editing ? product.title :""))#title
-        label(for="imgUrl") Image url
-        input(type="text" name="imgUrl" value=(editing ? product.imgUrl :""))#imgUrl
+        label(for="imageUrl") Image url
+        input(type="text" name="imageUrl" value=(editing ? product.imageUrl :""))#imageUrl
         label(for="price") Price
         input(type="number" name="price" step="0.01" value=(editing ? product.price :""))#price
         label(for="description") Description
