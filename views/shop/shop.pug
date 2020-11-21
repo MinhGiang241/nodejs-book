@@ -17,7 +17,7 @@ block content
               h2.product__price $#{product.price}
               p.product__description #{product.description}
             .card__actions
-              a(href="products/"+ product.id).btn Details
+              a(href="products/"+ product._id).btn Details
               include ../includes/add-to-cart
     else
       h1 No Products
