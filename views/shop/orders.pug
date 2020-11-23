@@ -5,12 +5,13 @@ block styles
 
 block content 
   main.orders 
-    if orders.items.length <= 0
+    if orders.length <= 0
       h1 Nothing there
     else
       ul
-        each order in orders.items
-          li.orders__item   
-            h1 #{order._id}
-            ul.orders__products  
-              li.orders__products-item #{order.title}-( #{order.quantity})
+        each order in orders
+          li.orders__item 
+            each item in order.products  
+              h1 #{item._id}
+              ul.orders__products  
+                li.orders__products-item #{item.product.title}-( #{item.quantity})
