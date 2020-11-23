@@ -6,7 +6,6 @@ const authRoutes = require("./routes/auth");
 const path = require("path");
 const notFound = require("./controller/404");
 const User = require("./models/user");
-const { mongoConnect } = require("./util/database");
 const mongoose = require("mongoose");
 const session = require("express-session");
 const MongoDBStore = require("connect-mongodb-session")(session);
