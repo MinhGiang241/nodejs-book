@@ -1,5 +1,4 @@
 const express = require("express");
-const morgan = require("morgan");
 const bodyParser = require("body-parser");
 const adminRoutes = require("./routes/admin");
 const shopRoutes = require("./routes/shop");
@@ -9,19 +8,36 @@ const notFound = require("./controller/404");
 const User = require("./models/user");
 const { mongoConnect } = require("./util/database");
 const mongoose = require("mongoose");
+const session = require("express-session");
+const MongoDBStore = require("connect-mongodb-session")(session);
 
 const app = express();
-
-app.use(morgan("combined"));
+const MONGODB_URI =
+  "mongodb+srv://minhgiang241:concoc221992@cluster0.wmmld.mongodb.net/book";
+const store = new MongoDBStore({
+  uri: MONGODB_URI,
+  collection: "session",
+});
 
 app.set("view engine", "pug");
 app.set("views", "views");
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, "public")));
+app.use(
+  session({
+    secret: "my secret",
+    resave: false,
+    saveUninitialized: false,
+    store: store,
+  })
+);
 
 app.use((req, res, next) => {
-  User.findById("5fba112bdd40bc144c6103b2")
+  if (!req.session.user) {
+    return next();
+  }
+  User.findById(req.session.user._id)
     .then((user) => {
       req.user = user;
       next();
@@ -36,9 +52,7 @@ app.use(authRoutes);
 app.use(notFound.notFound);
 
 mongoose
-  .connect(
-    "mongodb+srv://minhgiang241:concoc221992@cluster0.wmmld.mongodb.net/book?retryWrites=true&w=majority"
-  )
+  .connect(MONGODB_URI)
   .then(() => {
     User.findOne().then((user) => {
       if (!user) {
