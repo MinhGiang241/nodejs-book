@@ -8,6 +8,8 @@ const notFound = require("./controller/404");
 const User = require("./models/user");
 const mongoose = require("mongoose");
 const session = require("express-session");
+const csurf = require("csurf");
+const flash = require("connect-flash");
 const MongoDBStore = require("connect-mongodb-session")(session);
 
 const app = express();
@@ -17,6 +19,7 @@ const store = new MongoDBStore({
   uri: MONGODB_URI,
   collection: "session",
 });
+const csurfProtection = csurf();
 
 app.set("view engine", "pug");
 app.set("views", "views");
@@ -31,6 +34,8 @@ app.use(
     store: store,
   })
 );
+app.use(csurfProtection);
+app.use(flash());
 
 app.use((req, res, next) => {
   if (!req.session.user) {
@@ -42,6 +47,12 @@ app.use((req, res, next) => {
       next();
     })
     .catch((err) => console.log(err));
+});
+
+app.use((req, res, next) => {
+  res.locals.isAuthenticated = req.session.isLoggedIn;
+  res.locals.csrfToken = req.csrfToken();
+  next();
 });
 
 app.use("/admin", adminRoutes);
