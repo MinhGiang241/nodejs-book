@@ -52,6 +52,9 @@ exports.postEditProduct = (req, res, next) => {
   const { id, title, imageUrl, price, description } = req.body;
   const product = Product.findById(id)
     .then((product) => {
+      if (product.userId.toString() !== req.user._id.toString()) {
+        return res.redirect("/");
+      }
       product.price = price;
       product.title = title;
       product.imageUrl = imageUrl;
@@ -66,7 +69,7 @@ exports.postEditProduct = (req, res, next) => {
 };
 
 exports.getProducts = (req, res, next) => {
-  Product.find()
+  Product.find({ userId: req.user._id })
     // .select("title price -_id")
     // .populate("userId", "name")
     .then((products) => {
@@ -81,7 +84,7 @@ exports.getProducts = (req, res, next) => {
 
 exports.postDeleteProduct = (req, res, next) => {
   const id = req.body.id;
-  Product.findByIdAndRemove(id)
+  Product.deleteOne({ _id: id, userId: req.user._id })
     .then((result) => {
       console.log("Destroyed product");
       res.redirect("/admin/product-list");

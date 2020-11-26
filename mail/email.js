@@ -26,12 +26,14 @@ const sendWelcomeEmail = (email, name) => {
   });
 };
 
-const sendCancelationEmail = (email, name) => {
+const sendResetPasswordEmail = (email, token, name) => {
   let mailOptions = {
     from: "minhgiang241@gmail.com",
     to: email,
     subject: "Thank you",
     text: `Thank you, ${name} for using my app`,
+    html: `<p>You requested a password</p>
+    <p>Click this <a href="http://localhost:3000/reset/${token}">Link here</a> to set a new Password</p>`,
   };
 
   transporter.sendMail(mailOptions, (err, data) => {
@@ -45,5 +47,5 @@ const sendCancelationEmail = (email, name) => {
 
 module.exports = {
   sendWelcomeEmail,
-  sendCancelationEmail,
+  sendResetPasswordEmail,
 };
