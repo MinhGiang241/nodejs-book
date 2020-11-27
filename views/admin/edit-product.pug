@@ -7,16 +7,19 @@ block styles
 
 block content
   main
-    form.product-form(action=( editing ? "/admin/edit-product" : "/admin/add-product")  method="POST")
+    if errorMessage
+      div.user-message.user-message--error #{errorMessage}  
+    form.product-form(action=( editing  ? "/admin/edit-product" : "/admin/add-product")  method="POST")
       .form-control
         label(for="title") Title
-        input(type="text" name="title" value=(editing ? product.title :""))#title
+        input(class= (validationErrors.find(e=>e.param === 'title' ) ?"invalid" : "") type="text" name="title" value=(editing || hasError ? product.title :""))#title
         label(for="imageUrl") Image url
-        input(type="text" name="imageUrl" value=(editing ? product.imageUrl :""))#imageUrl
+        input(class= (validationErrors.find(e=>e.param === 'imageUrl' ) ?"invalid" : "") type="text" name="imageUrl" value=(editing || hasError ? product.imageUrl :""))#imageUrl
         label(for="price") Price
-        input(type="number" name="price" step="0.01" value=(editing ? product.price :""))#price
+        input(class= (validationErrors.find(e=>e.param === 'price' ) ? "invalid" : "") type="number" name="price" step="0.01" value=(editing || hasError ? product.price :""))#price
         label(for="description") Description
-        textarea(type="text" name="description" rows="5" value=(editing ? product.description :""))#description
+        textarea(class= (validationErrors.find(e=>e.param === 'description' ) ? "invalid" : "") type="text" name="description" rows="5" value=(editing || hasError ? product.description :""))#description
+        input(type="hidden" name="_csrf" value=(csrfToken))
         if editing
           input(type="hidden" name="id" value=product._id)
       button.btn(type="submit") #{editing ? "Update product" : "Add Product"}
