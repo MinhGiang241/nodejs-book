@@ -1,6 +1,7 @@
 const Product = require("../models/products");
 const { ObjectId } = require("mongodb");
 const { validationResult } = require("express-validator/check");
+const fileHelper = require("../util/file");
 
 exports.getAddProduct = (req, res, next) => {
   res.render("admin/edit-product", {
@@ -15,15 +16,30 @@ exports.getAddProduct = (req, res, next) => {
 };
 
 exports.postAddProduct = (req, res, next) => {
-  const { title, imageUrl, price, description } = req.body;
+  const { title, price, description } = req.body;
+  const image = req.file;
   const errors = validationResult(req);
+  const imageUrl = image.path;
   const product = new Product({
     title,
     price,
     description,
-    imageUrl,
     userId: req.user,
+    imageUrl,
   });
+
+  if (!image) {
+    return res.status(422).render("admin/edit-product", {
+      product,
+      pageTitle: "Add product",
+      path: "/admin/add-product",
+      editing: false,
+      hasError: true,
+      errorMessage: "Attached file is an image",
+      validationErrors: errors.array(),
+    });
+  }
+
   if (!errors.isEmpty()) {
     return res.status(422).render("admin/edit-product", {
       product,
@@ -32,7 +48,7 @@ exports.postAddProduct = (req, res, next) => {
       editing: false,
       hasError: true,
       errorMessage: errors.array()[0].msg,
-      validationErrors: errors.array(),
+      validationErrors: [],
     });
   }
   product
@@ -87,6 +103,7 @@ exports.getEditProduct = (req, res, next) => {
 
 exports.postEditProduct = (req, res, next) => {
   const { id, title, imageUrl, price, description } = req.body;
+  const image = req.file;
 
   const errors = validationResult(req);
 
@@ -98,7 +115,6 @@ exports.postEditProduct = (req, res, next) => {
       hasError: true,
       product: {
         title,
-        imageUrl,
         price,
         description,
         _id: id,
@@ -115,7 +131,10 @@ exports.postEditProduct = (req, res, next) => {
       }
       product.price = price;
       product.title = title;
-      product.imageUrl = imageUrl;
+      if (image) {
+        fileHelper.deleteFile(product.imageUrl);
+        product.imageUrl = "/" + image.path;
+      }
       product.description = description;
       return product.save();
     })
@@ -150,7 +169,14 @@ exports.getProducts = (req, res, next) => {
 
 exports.postDeleteProduct = (req, res, next) => {
   const id = req.body.id;
-  Product.deleteOne({ _id: id, userId: req.user._id })
+  Product.findById(id)
+    .then((product) => {
+      if (!product) {
+        return next(new Error("product not found"));
+      }
+      fileHelper.deleteFile(product.imageUrl);
+      return Product.deleteOne({ _id: id, userId: req.user._id });
+    })
     .then((result) => {
       console.log("Destroyed product");
       res.redirect("/admin/product-list");

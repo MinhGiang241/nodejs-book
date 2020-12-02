@@ -13,5 +13,6 @@ block content
           li.orders__item 
             each item in order.products  
               h1 #{item._id}
+              a(href="/orders/"+order._id) Invoice
               ul.orders__products  
                 li.orders__products-item #{item.product.title}-( #{item.quantity})

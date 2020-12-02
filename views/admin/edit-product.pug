@@ -9,14 +9,21 @@ block content
   main
     if errorMessage
       div.user-message.user-message--error #{errorMessage}  
-    form.product-form(action=( editing  ? "/admin/edit-product" : "/admin/add-product")  method="POST")
+    form.product-form(action=( editing  ? "/admin/edit-product" : "/admin/add-product")  method="POST" enctype="multipart/form-data")
       .form-control
         label(for="title") Title
         input(class= (validationErrors.find(e=>e.param === 'title' ) ?"invalid" : "") type="text" name="title" value=(editing || hasError ? product.title :""))#title
+      .form-control
         label(for="imageUrl") Image url
         input(class= (validationErrors.find(e=>e.param === 'imageUrl' ) ?"invalid" : "") type="text" name="imageUrl" value=(editing || hasError ? product.imageUrl :""))#imageUrl
+      .form-control
+        label(for="image") Image
+        input(class= (validationErrors.find(e=>e.param === 'image' ) ?"invalid" : "") type="file" name="image")#image
+
+      .form-control  
         label(for="price") Price
         input(class= (validationErrors.find(e=>e.param === 'price' ) ? "invalid" : "") type="number" name="price" step="0.01" value=(editing || hasError ? product.price :""))#price
+      .form-control  
         label(for="description") Description
         textarea(class= (validationErrors.find(e=>e.param === 'description' ) ? "invalid" : "") type="text" name="description" rows="5" value=(editing || hasError ? product.description :""))#description
         input(type="hidden" name="_csrf" value=(csrfToken))
