@@ -20,5 +20,6 @@ block content
               a(href="products/"+ product._id).btn Details
               if isAuthenticated
                 include ../includes/add-to-cart
+      include ../includes/pagination             
     else
       h1 No Products
