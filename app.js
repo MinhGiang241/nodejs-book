@@ -80,9 +80,6 @@ app.use(
 app.use(csurfProtection);
 app.use(flash());
 
-// const privateKey = fs.readFileSync("server.key");
-// const certificate = fs.readFileSync("server.cert");
-
 app.use((req, res, next) => {
   res.locals.isAuthenticated = req.session.isLoggedIn;
   res.locals.csrfToken = req.csrfToken();
